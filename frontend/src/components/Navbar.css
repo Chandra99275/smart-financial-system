@@ -1,0 +1,35 @@
+.navbar {
+  display: flex;
+  justify-content: space-between; /* Title left, links right */
+  align-items: center;
+  background: linear-gradient(90deg, #0072ff, #00c6ff);
+  color: white;
+  padding: 15px 40px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.navbar-left h2 {
+  margin: 0;
+  font-weight: 600;
+}
+
+.navbar-right ul {
+  list-style: none;
+  display: flex;
+  gap: 30px; /* space between Home, Login, Signup */
+  margin: 0;
+  padding: 0;
+}
+
+.navbar-right li a {
+  text-decoration: none;
+  color: white;
+  font-weight: 500;
+  transition: 0.3s;
+}
+
+.navbar-right li a:hover {
+  color: #e0f2fe;
+  border-bottom: 2px solid white;
+  padding-bottom: 3px;
+}
