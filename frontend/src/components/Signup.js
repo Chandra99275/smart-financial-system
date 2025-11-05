@@ -1,160 +1,157 @@
-import React, { useState } from "react";
-import axios from "axios";
+// src/components/Signup.js
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 function Signup() {
-  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSignup = async (e) => {
+  useEffect(() => {
+    if (!document.getElementById("auth-animation-style")) {
+      const style = document.createElement("style");
+      style.id = "auth-animation-style";
+      style.textContent = `
+        @keyframes gradientShift {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(40px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+  }, []);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+    setLoading(true);
+
     try {
-      await axios.post("http://localhost:5000/api/auth/register", {
-        name,
-        email,
-        password,
+      const res = await fetch("http://localhost:5000/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, email, password }),
       });
+
+      const data = await res.json();
+      console.log("🔹 Signup Response:", data);
+
+      if (!res.ok) throw new Error(data.message || "Signup failed");
+
       alert("Signup successful! Please login.");
-      window.location.href = "/login";
+      navigate("/login");
     } catch (err) {
-      alert("User already exists or registration failed.");
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   const styles = {
-    page: {
-      height: "100vh",
+    container: {
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
-      background: "linear-gradient(135deg, #0f2027, #203a43, #2c5364)",
-      fontFamily: "'Inter', sans-serif",
-      overflow: "hidden",
+      height: "100vh",
+      background:
+        "linear-gradient(-45deg, #e3f2fd, #bbdefb, #90caf9, #64b5f6)",
+      backgroundSize: "400% 400%",
+      animation: "gradientShift 10s ease infinite",
+      fontFamily: "'Poppins', sans-serif",
+      padding: "20px",
     },
-    glassCard: {
-      background: "rgba(255, 255, 255, 0.1)",
-      backdropFilter: "blur(16px)",
-      border: "1px solid rgba(255, 255, 255, 0.15)",
-      borderRadius: "16px",
-      padding: "50px 45px",
+    card: {
+      background: "rgba(255, 255, 255, 0.95)",
+      borderRadius: "20px",
+      boxShadow: "0 10px 30px rgba(13,71,161,0.15)",
+      padding: "40px",
       width: "90%",
       maxWidth: "420px",
       textAlign: "center",
-      color: "#ffffff",
-      boxShadow: "0 8px 32px rgba(0, 0, 0, 0.25)",
-      animation: "fadeIn 0.9s ease-in-out",
+      color: "#0d47a1",
+      animation: "fadeInUp 0.8s ease forwards",
     },
-    logo: {
-      fontSize: "2.4rem",
-      fontWeight: "700",
-      marginBottom: "10px",
-      background: "linear-gradient(90deg, #4facfe, #00f2fe)",
+    title: {
+      background: "linear-gradient(90deg, #1976d2, #0d47a1)",
       WebkitBackgroundClip: "text",
       WebkitTextFillColor: "transparent",
-    },
-    tagline: {
-      fontSize: "1rem",
-      color: "#cfd8dc",
-      marginBottom: "35px",
+      fontSize: "1.8rem",
+      fontWeight: "700",
+      marginBottom: "20px",
     },
     input: {
       width: "100%",
-      padding: "14px 16px",
-      marginBottom: "18px",
+      padding: "12px",
       borderRadius: "10px",
-      border: "1px solid rgba(255,255,255,0.2)",
-      background: "rgba(255,255,255,0.15)",
-      color: "#fff",
+      border: "1px solid #bbdefb",
       fontSize: "1rem",
-      outline: "none",
-      transition: "all 0.3s ease",
+      marginBottom: "15px",
+      color: "#0d47a1",
     },
     button: {
       width: "100%",
-      padding: "14px",
-      border: "none",
+      padding: "12px",
       borderRadius: "10px",
+      border: "none",
+      backgroundColor: "#1976d2",
       color: "#fff",
-      fontWeight: "600",
       fontSize: "1rem",
-      background: "linear-gradient(90deg, #43cea2, #185a9d)",
+      fontWeight: "600",
       cursor: "pointer",
       transition: "all 0.3s ease",
-      boxShadow: "0 4px 15px rgba(67,206,162,0.3)",
-    },
-    footer: {
-      marginTop: "25px",
-      fontSize: "0.95rem",
-      color: "#cfd8dc",
-    },
-    link: {
-      color: "#00f2fe",
-      textDecoration: "none",
-      fontWeight: "600",
+      boxShadow: "0 5px 15px rgba(25,118,210,0.3)",
     },
   };
 
   return (
-    <div style={styles.page}>
-      <style>
-        {`
-          @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-          }
+    <div style={styles.container}>
+      <div style={styles.card}>
+        <h1 style={styles.title}>Create an Account</h1>
+        {error && <p style={{ color: "red", fontWeight: "600" }}>{error}</p>}
 
-          input:focus {
-            background: rgba(255,255,255,0.25) !important;
-            box-shadow: 0 0 0 2px #00f2fe;
-          }
-
-          button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(67,206,162,0.45);
-          }
-
-          button:active {
-            transform: scale(0.98);
-          }
-        `}
-      </style>
-
-      <div style={styles.glassCard}>
-        <h1 style={styles.logo}>PFM Signup</h1>
-        <p style={styles.tagline}>Create your account to manage finances smartly.</p>
-
-        <form onSubmit={handleSignup}>
+        <form onSubmit={handleSubmit}>
           <input
             type="text"
-            placeholder="Full Name"
             style={styles.input}
-            onChange={(e) => setName(e.target.value)}
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             required
           />
           <input
             type="email"
-            placeholder="Email Address"
             style={styles.input}
+            placeholder="Email"
+            value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
           />
           <input
             type="password"
-            placeholder="Create Password"
             style={styles.input}
+            placeholder="Password"
+            value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          <button type="submit" style={styles.button}>
-            Sign Up
+          <button type="submit" style={styles.button} disabled={loading}>
+            {loading ? "Signing up..." : "Sign Up"}
           </button>
         </form>
 
-        <p style={styles.footer}>
+        <p style={{ marginTop: "15px" }}>
           Already have an account?{" "}
-          <a href="/login" style={styles.link}>
-            Login here
-          </a>
+          <Link to="/login" style={{ color: "#1976d2", fontWeight: "600" }}>
+            Login
+          </Link>
         </p>
       </div>
     </div>

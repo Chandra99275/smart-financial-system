@@ -1,3 +1,4 @@
+// src/components/Login.js
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
@@ -8,12 +9,12 @@ function Login({ setUser }) {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  // ✅ Add animations only once
+  // 🔹 Animation styles only once
   useEffect(() => {
-    if (!document.getElementById("login-animation-style")) {
-      const styleTag = document.createElement("style");
-      styleTag.id = "login-animation-style";
-      styleTag.textContent = `
+    if (!document.getElementById("auth-animation-style")) {
+      const style = document.createElement("style");
+      style.id = "auth-animation-style";
+      style.textContent = `
         @keyframes gradientShift {
           0% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }
@@ -24,11 +25,10 @@ function Login({ setUser }) {
           to { opacity: 1; transform: translateY(0); }
         }
       `;
-      document.head.appendChild(styleTag);
+      document.head.appendChild(style);
     }
   }, []);
 
-  // ✅ Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -44,29 +44,28 @@ function Login({ setUser }) {
       const data = await res.json();
       console.log("🔹 Server Response:", data);
 
-      if (!res.ok) throw new Error(data.message || "Invalid credentials");
+      if (!res.ok) {
+        if (res.status === 404) throw new Error("User does not exist");
+        if (res.status === 401) throw new Error("Incorrect password");
+        throw new Error(data.message || "Login failed");
+      }
 
-      // ✅ Normalize backend response
       const userData = {
         username: data.user?.username || "User",
         email: data.user?.email || email,
-        userId: data.user?._id || data.user?.id || "unknown",
+        userId: data.user?._id || data.user?.id,
       };
 
-      // ✅ Store user and navigate
       setUser(userData);
       localStorage.setItem("user", JSON.stringify(userData));
-      console.log("✅ Logged in user:", userData);
       navigate("/dashboard");
     } catch (err) {
-      console.error("❌ Login error:", err);
       setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  // ✅ Styles
   const styles = {
     container: {
       display: "flex",
@@ -89,7 +88,6 @@ function Login({ setUser }) {
       maxWidth: "420px",
       textAlign: "center",
       color: "#0d47a1",
-      backdropFilter: "blur(10px)",
       animation: "fadeInUp 0.8s ease forwards",
     },
     title: {
@@ -107,7 +105,6 @@ function Login({ setUser }) {
       border: "1px solid #bbdefb",
       fontSize: "1rem",
       marginBottom: "15px",
-      outline: "none",
       color: "#0d47a1",
     },
     button: {
@@ -128,13 +125,8 @@ function Login({ setUser }) {
   return (
     <div style={styles.container}>
       <div style={styles.card}>
-        <h1 style={styles.title}>Login to Your Account</h1>
-
-        {error && (
-          <p style={{ color: "red", fontWeight: "600", marginBottom: "10px" }}>
-            {error}
-          </p>
-        )}
+        <h1 style={styles.title}>Login</h1>
+        {error && <p style={{ color: "red", fontWeight: "600" }}>{error}</p>}
 
         <form onSubmit={handleSubmit}>
           <input

@@ -1,4 +1,3 @@
-// src/App.js
 import React, { useState, useEffect } from "react";
 import {
   BrowserRouter as Router,
@@ -9,12 +8,12 @@ import {
 import Login from "./components/Login";
 import Signup from "./components/Signup";
 import Dashboard from "./components/Dashboard";
-import Home from "./components/Home"; // ✅ Import your Home page
+import Home from "./components/Home";
 
 function App() {
   const [user, setUser] = useState(null);
 
-  // ✅ Load saved user from localStorage (persistence)
+  // 🔹 Load user from localStorage on page refresh
   useEffect(() => {
     const savedUser = localStorage.getItem("user");
     if (savedUser) {
@@ -22,13 +21,13 @@ function App() {
     }
   }, []);
 
-  // ✅ When user logs in
+  // 🔹 Handle login
   const handleLogin = (userData) => {
     setUser(userData);
     localStorage.setItem("user", JSON.stringify(userData));
   };
 
-  // ✅ When user logs out
+  // 🔹 Handle logout
   const handleLogout = () => {
     setUser(null);
     localStorage.removeItem("user");
@@ -37,13 +36,13 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* ✅ Home page (default route) */}
+        {/* 🏠 Home Page */}
         <Route
           path="/"
           element={user ? <Navigate to="/dashboard" replace /> : <Home />}
         />
 
-        {/* ✅ Login route */}
+        {/* 🔑 Login */}
         <Route
           path="/login"
           element={
@@ -55,7 +54,7 @@ function App() {
           }
         />
 
-        {/* ✅ Signup route */}
+        {/* 📝 Signup */}
         <Route
           path="/signup"
           element={
@@ -67,19 +66,19 @@ function App() {
           }
         />
 
-        {/* ✅ Dashboard route */}
+        {/* 📊 Dashboard (protected route) */}
         <Route
           path="/dashboard"
           element={
             user ? (
               <Dashboard user={user} onLogout={handleLogout} />
             ) : (
-              <Navigate to="/" replace />
+              <Navigate to="/login" replace />
             )
           }
         />
 
-        {/* ✅ Catch-all redirect */}
+        {/* 🌐 Catch-all redirect */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
